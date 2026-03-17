@@ -1,0 +1,127 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: userId (from Firebase Auth)
+    // Fields:
+    //   - email: string (required)
+    //   - storeName: string (required)
+    //   - plan: number (required)
+    //
+    // Collection: products
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required)
+    //   - name: string (required)
+    //   - category: string (required)
+    //   - unit: string (required)
+    //   - costPrice: number (required)
+    //   - sellingPrice: number (required)
+    //   - stockQuantity: number (required)
+    //   - minStockLevel: number
+    //
+    // Collection: sales
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required)
+    //   - productId: string (required)
+    //   - productName: string
+    //   - quantity: number (required)
+    //   - totalPrice: number (required)
+    //   - profit: number (required)
+    //   - saleDate: timestamp (required)
+    //
+    // Collection: feedback
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required)
+    //   - rating: number (required)
+    //   - comments: string
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.email == "carlderick89@gmail.com" && request.auth.token.email_verified == true);
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['email', 'storeName', 'plan']) &&
+             data.email is string && data.email.size() > 0 &&
+             data.storeName is string && data.storeName.size() > 0 &&
+             data.plan is number;
+    }
+
+    function isValidProduct(data) {
+      return data.keys().hasAll(['userId', 'name', 'category', 'unit', 'costPrice', 'sellingPrice', 'stockQuantity']) &&
+             data.userId == request.auth.uid &&
+             data.name is string && data.name.size() > 0 &&
+             data.category is string && data.category.size() > 0 &&
+             data.unit is string && data.unit.size() > 0 &&
+             data.costPrice is number && data.costPrice >= 0 &&
+             data.sellingPrice is number && data.sellingPrice >= 0 &&
+             data.stockQuantity is number;
+    }
+
+    function isValidSale(data) {
+      return data.keys().hasAll(['userId', 'productId', 'quantity', 'totalPrice', 'profit', 'saleDate']) &&
+             data.userId == request.auth.uid &&
+             data.quantity is number && data.quantity > 0 &&
+             data.totalPrice is number &&
+             data.profit is number &&
+             data.saleDate is timestamp;
+    }
+
+    function isValidFeedback(data) {
+      return data.keys().hasAll(['userId', 'rating', 'createdAt']) &&
+             data.userId == request.auth.uid &&
+             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             data.createdAt is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) && 
+                      request.resource.data.email == resource.data.email;
+    }
+
+    match /products/{productId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidProduct(request.resource.data);
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid && isValidProduct(request.resource.data);
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    match /sales/{saleId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidSale(request.resource.data);
+    }
+
+    match /feedback/{feedbackId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated() && isValidFeedback(request.resource.data);
+    }
+  }
+}

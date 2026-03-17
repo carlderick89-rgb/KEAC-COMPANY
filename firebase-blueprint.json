@@ -1,0 +1,66 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "storeName": { "type": "string" },
+        "plan": { "type": "integer", "description": "Selected plan amount (300, 500, 1000)" }
+      },
+      "required": ["email", "storeName", "plan"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Inventory item",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "unit": { "type": "string" },
+        "costPrice": { "type": "number" },
+        "sellingPrice": { "type": "number" },
+        "stockQuantity": { "type": "integer" },
+        "minStockLevel": { "type": "integer" },
+        "targetStockLevel": { "type": "integer" }
+      },
+      "required": ["userId", "name", "category", "unit", "costPrice", "sellingPrice", "stockQuantity", "targetStockLevel"]
+    },
+    "Sale": {
+      "title": "Sale",
+      "description": "Transaction record",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "productId": { "type": "string" },
+        "productName": { "type": "string" },
+        "category": { "type": "string" },
+        "quantity": { "type": "integer" },
+        "totalPrice": { "type": "number" },
+        "profit": { "type": "number" },
+        "saleDate": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "productId", "quantity", "totalPrice", "profit", "saleDate"]
+    },
+    "Feedback": {
+      "title": "Feedback",
+      "description": "User feedback",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "rating": { "type": "integer" },
+        "comments": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "rating", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": { "schema": "User", "description": "User profiles" },
+    "/products/{productId}": { "schema": "Product", "description": "Inventory products" },
+    "/sales/{saleId}": { "schema": "Sale", "description": "Sales transactions" },
+    "/feedback/{feedbackId}": { "schema": "Feedback", "description": "User feedback" }
+  }
+}
