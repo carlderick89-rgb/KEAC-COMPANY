@@ -7,7 +7,7 @@
       "properties": {
         "email": { "type": "string", "format": "email" },
         "storeName": { "type": "string" },
-        "plan": { "type": "integer", "description": "Selected plan amount (300, 500, 1000)" }
+        "plan": { "type": "integer", "description": "Selected plan amount (300: Platform, 600: SIM Card, 1000: 1 Year)" }
       },
       "required": ["email", "storeName", "plan"]
     },

@@ -181,9 +181,9 @@ class ErrorBoundary extends React.Component<any, any> {
 
 const PlanSelection = ({ user, onPlanSelected }: { user: User, onPlanSelected: (plan: number) => void }) => {
   const plans = [
-    { amount: 300, label: 'Basic', features: ['Inventory Tracking', 'Sales Recording', 'Basic Reports'] },
-    { amount: 500, label: 'Standard', features: ['Everything in Basic', 'Profit Tracking', 'Low Stock Alerts'] },
-    { amount: 1000, label: 'Premium', features: ['Everything in Standard', 'Advanced Analytics', 'Priority Support'] }
+    { amount: 300, label: 'Monthly Plan', period: '/month', features: ['₱15 for the next month', 'Inventory Tracking', 'Sales Recording', 'Basic Reports'] },
+    { amount: 600, label: 'SIM Bundle', period: '/month', features: ['Includes SIM Card', '₱15 for the next month', 'Full System Access', 'Low Stock Alerts'] },
+    { amount: 1000, label: 'Annual Plan', period: '/year', features: ['Valid for 1 Year', 'Full System Access', 'Advanced Analytics', 'Priority Support'] }
   ];
 
   const handleSelect = async (amount: number) => {
@@ -219,7 +219,7 @@ const PlanSelection = ({ user, onPlanSelected }: { user: User, onPlanSelected: (
                 <h3 className="font-serif text-2xl mb-1">{plan.label}</h3>
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl font-bold">₱{plan.amount}</span>
-                  <span className="text-gray-400 text-sm">/month</span>
+                  <span className="text-gray-400 text-sm">{plan.period}</span>
                 </div>
               </div>
               
@@ -1520,7 +1520,7 @@ const Management = () => {
                   <span className={cn(
                     "px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
                     s.plan === 1000 ? "bg-purple-100 text-purple-600" :
-                    s.plan === 500 ? "bg-blue-100 text-blue-600" :
+                    s.plan === 600 ? "bg-blue-100 text-blue-600" :
                     s.plan === 300 ? "bg-emerald-100 text-emerald-600" :
                     "bg-gray-100 text-gray-600"
                   )}>
