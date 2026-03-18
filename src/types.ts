@@ -16,6 +16,8 @@ export interface Product {
   stockQuantity: number;
   minStockLevel: number;
   targetStockLevel: number;
+  restockDone?: boolean;
+  saleDone?: boolean;
 }
 
 export interface Sale {

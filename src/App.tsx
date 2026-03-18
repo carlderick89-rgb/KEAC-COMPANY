@@ -248,53 +248,6 @@ const PlanSelection = ({ user, onPlanSelected }: { user: User, onPlanSelected: (
   );
 };
 
-const LandingPage = ({ onStart }: { onStart: () => void }) => {
-  const isOnline = navigator.onLine;
-  return (
-    <div className="min-h-screen bg-[#F5F5F0] flex flex-col items-center justify-center p-6 text-center">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full bg-white rounded-[32px] p-10 shadow-xl border border-black/5"
-      >
-        <div className="w-20 h-20 bg-[#5A5A40] rounded-full flex items-center justify-center mx-auto mb-6">
-          <Store className="text-white w-10 h-10" />
-        </div>
-        <h1 className="font-serif text-4xl font-light text-[#1A1A1A] mb-4">
-          Sari-Sari Store <br />
-          <span className="italic">Inventory System</span>
-        </h1>
-        <p className="text-[#5A5A40] mb-8 font-serif italic">
-          Operational Feasibility Study Pilot <br />
-          Daraga, Albay
-        </p>
-        
-        <div className="bg-[#F5F5F0] p-6 rounded-2xl mb-8 flex flex-col items-center">
-          <QRCodeSVG value={window.location.href} size={160} />
-          <p className="text-xs mt-4 text-[#5A5A40] uppercase tracking-widest font-medium">Scan to Access System</p>
-        </div>
-
-        {!isOnline && (
-          <div className="mb-6 p-4 bg-amber-50 rounded-2xl text-amber-700 text-sm flex items-center gap-2 justify-center">
-            <WifiOff size={16} /> First-time setup requires internet.
-          </div>
-        )}
-
-        <div className="space-y-3">
-          <motion.button 
-            whileTap={{ scale: 0.98 }}
-            onClick={onStart}
-            disabled={!isOnline}
-            className="w-full bg-[#5A5A40] text-white py-4 rounded-full font-medium hover:bg-[#4A4A30] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            Enter System <ChevronRight size={18} />
-          </motion.button>
-        </div>
-      </motion.div>
-    </div>
-  );
-};
-
 const AuthPage = ({ onAuth }: { onAuth: (user: User) => void }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -742,7 +695,9 @@ const Inventory = ({ user }: { user: User }) => {
           sellingPrice: parseFloat(sellingPrice),
           stockQuantity: parseInt(stockQuantity),
           minStockLevel: parseInt(minStock),
-          targetStockLevel: parseInt(targetStock)
+          targetStockLevel: parseInt(targetStock),
+          restockDone: false,
+          saleDone: false
         });
       }
       setIsAdding(false);
@@ -761,7 +716,9 @@ const Inventory = ({ user }: { user: User }) => {
         stockQuantity: parseInt(editStock),
         sellingPrice: parseFloat(editPrice),
         costPrice: parseFloat(editCost),
-        targetStockLevel: parseInt(editTargetStock)
+        targetStockLevel: parseInt(editTargetStock),
+        restockDone: false, // Reset restock status when updating stock/price
+        saleDone: false // Reset sale status when updating stock/price
       });
       setEditingProduct(null);
     } catch (e) {
@@ -790,12 +747,76 @@ const Inventory = ({ user }: { user: User }) => {
 
   const categories = ['All', ...PREDEFINED_CATEGORIES];
 
-  const filteredProducts = products.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         p.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredProducts = products
+    .filter(p => {
+      const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           p.category.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const printLowStock = () => {
+    const lowStockItems = products.filter(p => p.stockQuantity <= p.minStockLevel);
+    if (lowStockItems.length === 0) {
+      alert("No low stock items found!");
+      return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const html = `
+      <html>
+        <head>
+          <title>Low Stock Shopping List</title>
+          <style>
+            body { font-family: sans-serif; padding: 40px; }
+            h1 { font-family: serif; border-bottom: 2px solid #5A5A40; padding-bottom: 10px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            th { background-color: #F5F5F0; }
+            .footer { margin-top: 40px; font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 10px; }
+          </style>
+        </head>
+        <body>
+          <h1>Low Stock Shopping List</h1>
+          <p>Date: ${new Date().toLocaleDateString()}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th>Current Stock</th>
+                <th>Target Stock</th>
+                <th>Need to Buy</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${lowStockItems.map(p => `
+                <tr>
+                  <td>${p.name} (${p.unit})</td>
+                  <td>${p.stockQuantity}</td>
+                  <td>${p.targetStockLevel || p.minStockLevel * 2}</td>
+                  <td><strong>${Math.max(0, (p.targetStockLevel || p.minStockLevel * 2) - p.stockQuantity)}</strong></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div class="footer">
+            Generated by Sari-Sari Store Manager
+          </div>
+          <script>
+            window.onload = () => {
+              window.print();
+              window.onafterprint = () => window.close();
+            }
+          </script>
+        </body>
+      </html>
+    `;
+    printWindow.document.write(html);
+    printWindow.document.close();
+  };
 
   return (
     <div className="space-y-6">
@@ -805,6 +826,12 @@ const Inventory = ({ user }: { user: User }) => {
           <p className="text-[#5A5A40] italic font-serif">Manage your stock and pricing</p>
         </div>
         <div className="flex gap-3">
+          <button 
+            onClick={printLowStock}
+            className="bg-white border border-black/10 text-amber-600 px-6 py-3 rounded-full font-medium flex items-center gap-2 hover:bg-amber-50 transition-colors"
+          >
+            <AlertTriangle size={18} /> Print Low Stock
+          </button>
           <button 
             onClick={() => window.print()}
             className="bg-white border border-black/10 text-[#5A5A40] px-6 py-3 rounded-full font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors"
@@ -820,36 +847,35 @@ const Inventory = ({ user }: { user: User }) => {
         </div>
       </div>
 
-      <div className="bg-white rounded-[32px] shadow-sm border border-black/5 overflow-hidden">
-        <div className="p-6 border-b border-black/5 space-y-4">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input 
-                type="text"
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-[#F5F5F0] border-none rounded-2xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-[#5A5A40] outline-none"
-              />
-            </div>
-          </div>
+      <div className="bg-white rounded-[32px] shadow-sm border border-black/5 overflow-hidden flex flex-col">
+        {/* Excel-style Tabs (Sheets) */}
+        <div className="flex items-center bg-[#F5F5F0]/50 border-b border-black/10 overflow-x-auto scrollbar-hide">
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={cn(
+                "px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap border-r border-black/5",
+                activeCategory === cat 
+                  ? "bg-white text-[#5A5A40] border-b-2 border-b-[#5A5A40] shadow-[0_-2px_10px_rgba(0,0,0,0.05)]" 
+                  : "text-gray-400 hover:bg-white/50 hover:text-gray-600"
+              )}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
 
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap",
-                  activeCategory === cat 
-                    ? "bg-[#5A5A40] text-white shadow-md" 
-                    : "bg-[#F5F5F0] text-[#5A5A40] hover:bg-gray-200"
-                )}
-              >
-                {cat}
-              </button>
-            ))}
+        <div className="p-6 border-b border-black/5">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input 
+              type="text"
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-[#F5F5F0] border-none rounded-2xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-[#5A5A40] outline-none"
+            />
           </div>
         </div>
 
@@ -865,6 +891,7 @@ const Inventory = ({ user }: { user: User }) => {
                 <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Stock</th>
                 <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Status</th>
                 <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Restock</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Restock Done</th>
                 <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Action</th>
               </tr>
             </thead>
@@ -899,6 +926,24 @@ const Inventory = ({ user }: { user: User }) => {
                   </td>
                   <td className="px-6 py-4">
                     <button 
+                      onClick={async () => {
+                        try {
+                          await updateDoc(doc(db, 'products', p.id), { restockDone: !p.restockDone });
+                        } catch (e) {
+                          handleFirestoreError(e, OperationType.UPDATE, `products/${p.id}`);
+                        }
+                      }}
+                      className={cn(
+                        "flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all",
+                        p.restockDone ? "bg-emerald-500 text-white" : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                      )}
+                    >
+                      {p.restockDone ? <Check size={10} /> : null}
+                      {p.restockDone ? 'Done' : 'Mark Done'}
+                    </button>
+                  </td>
+                  <td className="px-6 py-4">
+                    <button 
                       onClick={() => startEditing(p)}
                       className="text-[#5A5A40] hover:text-black transition-colors"
                     >
@@ -909,7 +954,7 @@ const Inventory = ({ user }: { user: User }) => {
               ))}
               {filteredProducts.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-400 italic">
+                  <td colSpan={9} className="px-6 py-12 text-center text-gray-400 italic">
                     {loading ? 'Loading products...' : 'No products found.'}
                   </td>
                 </tr>
@@ -1187,68 +1232,150 @@ const Sales = ({ user }: { user: User }) => {
 
   const categories = ['All', ...PREDEFINED_CATEGORIES];
 
-  const filteredProducts = products.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
-    return matchesSearch && matchesCategory && p.stockQuantity > 0;
-  });
+  const filteredProducts = products
+    .filter(p => {
+      const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
+      return matchesSearch && matchesCategory && p.stockQuantity > 0;
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <div className="lg:col-span-2 space-y-6">
-        <div>
-          <h1 className="font-serif text-3xl font-light">Record Sale</h1>
-          <p className="text-[#5A5A40] italic font-serif">Quickly record customer purchases</p>
+      <div className="lg:col-span-2 flex flex-col h-[calc(100vh-120px)]">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="font-serif text-3xl font-light">Record Sale</h1>
+            <p className="text-[#5A5A40] italic font-serif">Quickly record customer purchases</p>
+          </div>
+          <button 
+            onClick={async () => {
+              if (!confirm('Are you sure you want to reset all "Done" marks?')) return;
+              try {
+                const batch = writeBatch(db);
+                products.forEach(p => {
+                  if (p.saleDone) {
+                    batch.update(doc(db, 'products', p.id), { saleDone: false });
+                  }
+                });
+                await batch.commit();
+              } catch (e) {
+                handleFirestoreError(e, OperationType.WRITE, 'products/reset-sales');
+              }
+            }}
+            className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-[#5A5A40] transition-colors"
+          >
+            Reset All Marks
+          </button>
         </div>
 
-        <div className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input 
-              type="text"
-              placeholder="Search products to sell..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white border-none rounded-2xl pl-12 pr-4 py-4 shadow-sm focus:ring-2 focus:ring-[#5A5A40] outline-none"
-            />
-          </div>
-
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="bg-white rounded-[32px] shadow-sm border border-black/5 flex flex-col flex-1 overflow-hidden">
+          {/* Excel-style Tabs (Sheets) at the top */}
+          <div className="flex items-center bg-[#F5F5F0]/50 border-b border-black/10 overflow-x-auto scrollbar-hide">
             {categories.map(cat => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap",
+                  "px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap border-r border-black/5",
                   activeCategory === cat 
-                    ? "bg-[#5A5A40] text-white shadow-md" 
-                    : "bg-white text-[#5A5A40] border border-black/5 hover:bg-gray-50"
+                    ? "bg-white text-[#5A5A40] border-b-2 border-b-[#5A5A40] shadow-[0_-2px_10px_rgba(0,0,0,0.05)]" 
+                    : "text-gray-400 hover:bg-white/50 hover:text-gray-600"
                 )}
               >
                 {cat}
               </button>
             ))}
           </div>
-        </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {filteredProducts.map(p => (
-            <button 
-              key={p.id}
-              onClick={() => {
-                setSelectedProduct(p);
-                setQuantityInput('1');
-              }}
-              className="bg-white p-4 rounded-3xl border border-black/5 shadow-sm text-left hover:border-[#5A5A40] transition-all group"
-            >
-              <p className="font-medium mb-1 group-hover:text-[#5A5A40] transition-colors">{p.name}</p>
-              <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-tighter">{p.category} • {p.unit}</p>
-              <div className="flex items-center justify-between">
-                <p className="font-bold">{formatCurrency(p.sellingPrice)}</p>
-                <p className="text-[10px] bg-[#F5F5F0] px-2 py-1 rounded-full text-gray-500">Stock: {p.stockQuantity}</p>
-              </div>
-            </button>
-          ))}
+          <div className="p-4 border-b border-black/5">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <input 
+                type="text"
+                placeholder="Search products to sell..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-[#F5F5F0] border-none rounded-xl pl-12 pr-4 py-3 shadow-inner focus:ring-2 focus:ring-[#5A5A40] outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-[#F5F5F0]/50 sticky top-0 z-10">
+                  <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Product Name</th>
+                  <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Unit</th>
+                  <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Price</th>
+                  <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Stock</th>
+                  <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Done?</th>
+                  <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-black/5">
+                {filteredProducts.map(p => (
+                  <tr key={p.id} className={cn(
+                    "hover:bg-[#F5F5F0]/30 transition-colors group",
+                    p.saleDone && "opacity-50"
+                  )}>
+                    <td className="px-6 py-4 font-medium">
+                      <div className="flex items-center gap-2">
+                        {p.name}
+                        {p.saleDone && <Check size={14} className="text-emerald-500" />}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-xs text-gray-400 italic">{p.unit}</td>
+                    <td className="px-6 py-4 font-black text-[#5A5A40]">{formatCurrency(p.sellingPrice)}</td>
+                    <td className="px-6 py-4">
+                      <span className={cn(
+                        "px-2 py-1 rounded-md text-[10px] font-bold",
+                        p.stockQuantity <= p.minStockLevel ? "bg-amber-100 text-amber-700" : "bg-[#F5F5F0] text-gray-500"
+                      )}>
+                        {p.stockQuantity}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <button 
+                        onClick={async () => {
+                          try {
+                            await updateDoc(doc(db, 'products', p.id), { saleDone: !p.saleDone });
+                          } catch (e) {
+                            handleFirestoreError(e, OperationType.UPDATE, `products/${p.id}`);
+                          }
+                        }}
+                        className={cn(
+                          "w-6 h-6 rounded-md border flex items-center justify-center transition-all",
+                          p.saleDone ? "bg-emerald-500 border-emerald-500 text-white" : "border-gray-200 text-transparent hover:border-emerald-500"
+                        )}
+                      >
+                        <Check size={14} />
+                      </button>
+                    </td>
+                    <td className="px-6 py-4">
+                      <button 
+                        disabled={p.saleDone}
+                        onClick={() => {
+                          setSelectedProduct(p);
+                          setQuantityInput('1');
+                        }}
+                        className="bg-[#5A5A40] text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-[#4A4A30] transition-all shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        Sell
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {filteredProducts.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-20 text-center text-gray-400 italic">
+                      No products found in this sheet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -1597,7 +1724,7 @@ const MobileLegendsIntro = ({ onComplete }: { onComplete: () => void }) => {
 // --- Main App ---
 
 export default function App() {
-  const [step, setStep] = useState<'landing' | 'auth' | 'app'>('landing');
+  const [step, setStep] = useState<'auth' | 'app'>('auth');
   const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'sales' | 'survey' | 'management'>('dashboard');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -1621,7 +1748,7 @@ export default function App() {
         }
       } else {
         setUser(null);
-        setStep('landing');
+        setStep('auth');
       }
       setIsAuthReady(true);
     });
@@ -1645,7 +1772,6 @@ export default function App() {
 
   if (showIntro) return <MobileLegendsIntro onComplete={() => setShowIntro(false)} />;
 
-  if (step === 'landing') return <LandingPage onStart={() => setStep('auth')} />;
   if (step === 'auth' && !user) return <AuthPage onAuth={(u) => { setUser(u); setStep('app'); }} />;
   
   if (user && user.plan === 0) {
