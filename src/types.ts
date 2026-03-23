@@ -3,6 +3,8 @@ export interface User {
   email: string;
   storeName: string;
   plan: number;
+  subscriptionStart?: string;
+  subscriptionEnd?: string;
 }
 
 export interface Product {

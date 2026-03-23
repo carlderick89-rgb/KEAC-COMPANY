@@ -179,18 +179,31 @@ class ErrorBoundary extends React.Component<any, any> {
 
 // --- Components ---
 
-const PlanSelection = ({ user, onPlanSelected }: { user: User, onPlanSelected: (plan: number) => void }) => {
+const PlanSelection = ({ user, onPlanSelected }: { user: User, onPlanSelected: (plan: number, start: string, end: string) => void }) => {
   const plans = [
     { amount: 300, label: 'Monthly Plan', period: '/month', features: ['₱15 for the next month', 'Inventory Tracking', 'Sales Recording', 'Basic Reports'] },
     { amount: 600, label: 'SIM Bundle', period: '/month', features: ['Includes SIM Card', '₱15 for the next month', 'Full System Access', 'Low Stock Alerts'] },
-    { amount: 1000, label: 'Annual Plan', period: '/year', features: ['Valid for 1 Year', 'Full System Access', 'Advanced Analytics', 'Priority Support'] }
+    { amount: 900, label: 'Annual Plan', period: '/year', features: ['Valid for 1 Year', 'Full System Access', 'Advanced Analytics', 'Priority Support'] }
   ];
 
   const handleSelect = async (amount: number) => {
     try {
+      const start = new Date().toISOString();
+      const end = new Date();
+      if (amount === 900) {
+        end.setFullYear(end.getFullYear() + 1);
+      } else {
+        end.setMonth(end.getMonth() + 1);
+      }
+      const endStr = end.toISOString();
+
       const userRef = doc(db, 'users', user.id);
-      await updateDoc(userRef, { plan: amount });
-      onPlanSelected(amount);
+      await updateDoc(userRef, { 
+        plan: amount,
+        subscriptionStart: start,
+        subscriptionEnd: endStr
+      });
+      onPlanSelected(amount, start, endStr);
     } catch (e) {
       handleFirestoreError(e, OperationType.UPDATE, `users/${user.id}`);
     }
@@ -1620,6 +1633,15 @@ const Management = () => {
 
   if (loading) return <div className="p-8">Loading management dashboard...</div>;
 
+  const getDaysRemaining = (endDate: string) => {
+    if (!endDate) return null;
+    const end = new Date(endDate);
+    const now = new Date();
+    const diffTime = end.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -1628,38 +1650,69 @@ const Management = () => {
       </div>
 
       <div className="bg-white rounded-[32px] shadow-sm border border-black/5 overflow-hidden">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="bg-[#F5F5F0]/50">
-              <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Store Name</th>
-              <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Owner Email</th>
-              <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Plan</th>
-              <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Products</th>
-              <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Total Sales</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-black/5">
-            {stats.map((s) => (
-              <tr key={s.id} className="hover:bg-[#F5F5F0]/30 transition-colors">
-                <td className="px-6 py-4 font-medium">{s.storeName}</td>
-                <td className="px-6 py-4 text-sm text-gray-500">{s.email}</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className={cn(
-                    "px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
-                    s.plan === 1000 ? "bg-purple-100 text-purple-600" :
-                    s.plan === 600 ? "bg-blue-100 text-blue-600" :
-                    s.plan === 300 ? "bg-emerald-100 text-emerald-600" :
-                    "bg-gray-100 text-gray-600"
-                  )}>
-                    {s.plan ? `₱${s.plan}` : 'No Plan'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm">{s.productCount}</td>
-                <td className="px-6 py-4 text-sm font-bold text-emerald-600">{formatCurrency(s.totalSales || 0)}</td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-[#F5F5F0]/50">
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Store Name</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Owner Email</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Plan</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Subscription</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Status</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Products</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Total Sales</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-black/5">
+              {stats.map((s) => {
+                const daysLeft = getDaysRemaining(s.subscriptionEnd);
+                return (
+                  <tr key={s.id} className="hover:bg-[#F5F5F0]/30 transition-colors">
+                    <td className="px-6 py-4 font-medium">{s.storeName}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{s.email}</td>
+                    <td className="px-6 py-4 text-sm">
+                      <span className={cn(
+                        "px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
+                        s.plan === 900 ? "bg-purple-100 text-purple-600" :
+                        s.plan === 600 ? "bg-blue-100 text-blue-600" :
+                        s.plan === 300 ? "bg-emerald-100 text-emerald-600" :
+                        "bg-gray-100 text-gray-600"
+                      )}>
+                        {s.plan ? `₱${s.plan}` : 'No Plan'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-[10px] text-gray-500">
+                      {s.subscriptionStart ? (
+                        <div>
+                          <div>Start: {new Date(s.subscriptionStart).toLocaleDateString()}</div>
+                          <div>End: {new Date(s.subscriptionEnd).toLocaleDateString()}</div>
+                        </div>
+                      ) : (
+                        'N/A'
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {daysLeft !== null ? (
+                        <span className={cn(
+                          "px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
+                          daysLeft <= 0 ? "bg-red-100 text-red-600" :
+                          daysLeft <= 7 ? "bg-amber-100 text-amber-600" :
+                          "bg-emerald-100 text-emerald-600"
+                        )}>
+                          {daysLeft <= 0 ? 'Expired' : `${daysLeft} days left`}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 text-[10px]">Inactive</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm">{s.productCount}</td>
+                    <td className="px-6 py-4 text-sm font-bold text-emerald-600">{formatCurrency(s.totalSales || 0)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
@@ -1775,7 +1828,7 @@ export default function App() {
   if (step === 'auth' && !user) return <AuthPage onAuth={(u) => { setUser(u); setStep('app'); }} />;
   
   if (user && user.plan === 0) {
-    return <PlanSelection user={user} onPlanSelected={(plan) => { setUser({ ...user, plan }); setShowIntro(true); }} />;
+    return <PlanSelection user={user} onPlanSelected={(plan, start, end) => { setUser({ ...user, plan, subscriptionStart: start, subscriptionEnd: end }); setShowIntro(true); }} />;
   }
 
   return (
