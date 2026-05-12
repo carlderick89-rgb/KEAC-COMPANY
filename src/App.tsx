@@ -181,16 +181,16 @@ class ErrorBoundary extends React.Component<any, any> {
 
 const PlanSelection = ({ user, onPlanSelected }: { user: User, onPlanSelected: (plan: number, start: string, end: string) => void }) => {
   const plans = [
-    { amount: 300, label: 'Monthly Plan', period: '/month', features: ['₱15 for the next month', 'Inventory Tracking', 'Sales Recording', 'Basic Reports'] },
-    { amount: 600, label: 'SIM Bundle', period: '/month', features: ['Includes SIM Card', '₱15 for the next month', 'Full System Access', 'Low Stock Alerts'] },
-    { amount: 900, label: 'Annual Plan', period: '/year', features: ['Valid for 1 Year', 'Full System Access', 'Advanced Analytics', 'Priority Support'] }
+    { amount: 49, label: 'Monthly Plan', period: '/month', features: ['₱15 for the next month', 'Inventory Tracking', 'Sales Recording', 'Basic Reports'] },
+    { amount: 100, label: 'SIM Bundle', period: '/month', features: ['Includes SIM Card', '₱15 for the next month', 'Full System Access', 'Low Stock Alerts'] },
+    { amount: 500, label: 'Annual Plan', period: '/year', features: ['Valid for 1 Year', 'Full System Access', 'Advanced Analytics', 'Priority Support'] }
   ];
 
   const handleSelect = async (amount: number) => {
     try {
       const start = new Date().toISOString();
       const end = new Date();
-      if (amount === 900) {
+      if (amount === 500) {
         end.setFullYear(end.getFullYear() + 1);
       } else {
         end.setMonth(end.getMonth() + 1);
@@ -1673,9 +1673,9 @@ const Management = () => {
                     <td className="px-6 py-4 text-sm">
                       <span className={cn(
                         "px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
-                        s.plan === 900 ? "bg-purple-100 text-purple-600" :
-                        s.plan === 600 ? "bg-blue-100 text-blue-600" :
-                        s.plan === 300 ? "bg-emerald-100 text-emerald-600" :
+                        s.plan === 500 ? "bg-purple-100 text-purple-600" :
+                        s.plan === 100 ? "bg-blue-100 text-blue-600" :
+                        s.plan === 49 ? "bg-emerald-100 text-emerald-600" :
                         "bg-gray-100 text-gray-600"
                       )}>
                         {s.plan ? `₱${s.plan}` : 'No Plan'}
