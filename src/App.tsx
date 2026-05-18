@@ -1815,21 +1815,12 @@ const MobileLegendsIntro = ({ onComplete }: { onComplete: () => void }) => {
 
 // --- Main App ---
 
-const MOCK_USER: User = {
-  id: 'main-admin',
-  email: 'carlderick89@gmail.com',
-  storeName: 'KEAC Main Store',
-  plan: 500,
-  subscriptionStart: new Date().toISOString(),
-  subscriptionEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
-};
-
 export default function App() {
-  const [step, setStep] = useState<'auth' | 'app'>('app');
-  const [user, setUser] = useState<User | null>(MOCK_USER);
+  const [step, setStep] = useState<'auth' | 'app'>('auth');
+  const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'sales' | 'survey' | 'management'>('dashboard');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [isAuthReady, setIsAuthReady] = useState(true);
+  const [isAuthReady, setIsAuthReady] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {
@@ -1843,7 +1834,13 @@ export default function App() {
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           setUser({ id: firebaseUser.uid, ...userSnap.data() } as User);
+          setStep('app');
+        } else {
+          setStep('auth');
         }
+      } else {
+        setUser(null);
+        setStep('auth');
       }
       setIsAuthReady(true);
     });
@@ -1863,11 +1860,15 @@ export default function App() {
     setStep('auth');
   };
 
-  if (!isAuthReady) return null;
+  if (!isAuthReady) return <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">Loading...</div>;
 
   if (showIntro) return <MobileLegendsIntro onComplete={() => setShowIntro(false)} />;
 
-  // Auth gate removed as per user request to directly show main app
+  if (step === 'auth' && !user) return <AuthPage onAuth={(u) => { setUser(u); setStep('app'); }} />;
+  
+  if (user && user.plan === 0) {
+    return <PlanSelection user={user} onPlanSelected={(plan, start, end) => { setUser({ ...user, plan, subscriptionStart: start, subscriptionEnd: end }); }} />;
+  }
   
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex">
@@ -1923,10 +1924,17 @@ export default function App() {
               <UserIcon size={14} />
             </div>
             <div className="hidden md:block overflow-hidden">
-              <p className="text-sm font-bold truncate text-[#0B1D42]">{user?.storeName}</p>
-              <p className="text-[10px] text-gray-400 truncate tracking-wider">{user?.email}</p>
+              <p className="text-sm font-semibold truncate text-[#0B1D42]">{user?.storeName}</p>
+              <p className="text-[10px] text-gray-400 truncate">{user?.email}</p>
             </div>
           </div>
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 p-3 rounded-xl text-red-500 hover:bg-red-50 transition-all font-medium"
+          >
+            <LogOut size={20} />
+            <span className="hidden md:block">Logout</span>
+          </button>
         </div>
       </aside>
 
