@@ -12,7 +12,6 @@ import {
   TrendingUp, 
   DollarSign, 
   Store,
-  QrCode,
   ChevronRight,
   User as UserIcon,
   MessageSquare,
@@ -25,7 +24,6 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
 import { User, Product, Sale, SalesSummary, InventorySummary } from './types';
 import { cn, formatCurrency } from './lib/utils';
 import { 
@@ -57,6 +55,7 @@ import {
   where, 
   onSnapshot, 
   addDoc, 
+  deleteDoc,
   serverTimestamp, 
   orderBy, 
   limit,
@@ -234,18 +233,18 @@ const KeacBranding = ({ size = "md", mode = "dark" }: { size?: "sm" | "md" | "lg
   const lineColor = mode === "dark" ? navy : light;
 
   const sizeClasses = {
-    sm: { h1: "text-2xl", h2: "text-[7px]", icon: "w-14 h-14", gap: "gap-2", dotSize: "w-1.5 h-1.5", lineH: "h-[1.5px]" },
-    md: { h1: "text-4xl", h2: "text-[11px]", icon: "w-24 h-24", gap: "gap-3", dotSize: "w-2 h-2", lineH: "h-[2px]" },
-    lg: { h1: "text-3xl md:text-5xl", h2: "text-[9px] md:text-[12px]", icon: "w-20 h-20 md:w-32 h-32", gap: "gap-3 md:gap-4", dotSize: "w-1.5 h-1.5 md:w-2 h-2", lineH: "h-[1.5px] md:h-[2px]" },
-    xl: { h1: "text-4xl md:text-6xl", h2: "text-[10px] md:text-[14px]", icon: "w-28 h-28 md:w-44 h-44", gap: "gap-3 md:gap-5", dotSize: "w-2 h-2 md:w-3 h-3", lineH: "h-[2px] md:h-[3px]" }
+    sm: { h1: "text-xl", h2: "text-[6px]", icon: "w-10 h-10", gap: "gap-2", dotSize: "w-1 h-1", lineH: "h-[0.8px]", tracking: "tracking-[0.15em]" },
+    md: { h1: "text-2xl", h2: "text-[8px]", icon: "w-16 h-16", gap: "gap-2.5", dotSize: "w-1.2 h-1.2", lineH: "h-[1px]", tracking: "tracking-[0.18em]" },
+    lg: { h1: "text-xl md:text-3xl", h2: "text-[7px] md:text-[9px]", icon: "w-16 h-16 md:w-24 h-24", gap: "gap-2.5 md:gap-3.5", dotSize: "w-1.2 h-1.2 md:w-1.8 h-1.8", lineH: "h-[1px] md:h-[1.5px]", tracking: "tracking-[0.2em]" },
+    xl: { h1: "text-2xl md:text-4xl", h2: "text-[8px] md:text-[11px]", icon: "w-20 h-20 md:w-32 h-32", gap: "gap-3 md:gap-4", dotSize: "w-1.5 h-1.5 md:w-2.2 h-2.2", lineH: "h-[1.5px] md:h-[2px]", tracking: "tracking-[0.22em]" }
   };
 
   const s = sizeClasses[size];
 
   return (
-    <div className={cn("flex items-center select-none", s.gap)}>
-      <KeacLogo className={s.icon} color={logoColor} />
-      <div className="flex flex-col text-left justify-center">
+    <div className={cn("flex items-center select-none max-w-full overflow-hidden", s.gap)}>
+      <KeacLogo className={cn("shrink-0", s.icon)} color={logoColor} />
+      <div className="flex flex-col text-left justify-center min-w-0">
         <div className={cn("font-brand font-black tracking-[0.1em] flex items-center leading-none", s.h1)} style={{ color: textColor }}>
           <span>K</span>
           <span className="mx-[0.025em]">E</span>
@@ -259,14 +258,14 @@ const KeacBranding = ({ size = "md", mode = "dark" }: { size?: "sm" | "md" | "lg
           <span className="mx-[0.025em]">C</span>
         </div>
         
-        <div className="flex flex-col mt-3">
+        <div className="flex flex-col mt-1.5 min-w-0">
           {/* Stylized divider line matching the image spacing */}
           <div className="flex items-center gap-0.5 px-[0.1em]">
-            <div className={cn(s.dotSize, "rounded-full border-2 shrink-0")} style={{ borderColor: lineColor }} />
+            <div className={cn(s.dotSize, "rounded-full border-[1.5px] shrink-0")} style={{ borderColor: lineColor }} />
             <div className={cn("flex-1", s.lineH)} style={{ backgroundColor: lineColor, opacity: 0.8 }} />
-            <div className={cn(s.dotSize, "rounded-full border-2 shrink-0")} style={{ borderColor: lineColor }} />
+            <div className={cn(s.dotSize, "rounded-full border-[1.5px] shrink-0")} style={{ borderColor: lineColor }} />
           </div>
-          <p className={cn("font-brand font-black uppercase tracking-[0.42em] mt-2 whitespace-nowrap px-[0.2em]", s.h2)} style={{ color: textColor }}>
+          <p className={cn("font-brand font-black uppercase mt-1 whitespace-nowrap px-[0.1em] overflow-hidden text-ellipsis", s.h2, s.tracking)} style={{ color: textColor }}>
             Inventory Management System
           </p>
         </div>
@@ -278,16 +277,43 @@ const KeacBranding = ({ size = "md", mode = "dark" }: { size?: "sm" | "md" | "lg
 
 const PlanSelection = ({ user, onPlanSelected }: { user: User, onPlanSelected: (plan: number, start: string, end: string) => void }) => {
   const plans = [
-    { amount: 49, label: 'Monthly Plan', period: '/month', features: ['₱15 for the next month', 'Inventory Tracking', 'Sales Recording', 'Basic Reports'] },
-    { amount: 100, label: 'SIM Bundle', period: '/month', features: ['Includes SIM Card', '₱15 for the next month', 'Full System Access', 'Low Stock Alerts'] },
-    { amount: 500, label: 'Annual Plan', period: '/year', features: ['Valid for 1 Year', 'Full System Access', 'Advanced Analytics', 'Priority Support'] }
+    { 
+      amount: 49, 
+      label: 'Monthly Base', 
+      period: '/month', 
+      features: ['Cost-plus Pricing', 'Inventory Tracking', 'Sales Recording', 'Basic Reports'],
+      note: 'Based on estimated monthly costs.'
+    },
+    { 
+      amount: 499, 
+      label: 'Annual Base', 
+      period: '/year', 
+      features: ['Discounted Price', 'Valid for 1 Year', 'Priority Support', 'Saves ₱89/year'],
+      note: 'Equivalent to ₱41.58/month.'
+    },
+    { 
+      amount: 199, 
+      label: 'Monthly Bundle', 
+      period: '/1st mo', 
+      subAmount: '₱149 thereafter',
+      features: ['Includes SIM Card', 'Connectivity Support', '1 Month Prepaid Load', 'Offline Support Mode'],
+      note: 'Best for limited connectivity.'
+    },
+    { 
+      amount: 599, 
+      label: 'Annual Bundle', 
+      period: '/year', 
+      features: ['System Access Only', 'Connectivity Support', 'Discounted Rate', 'Value-Based Features'],
+      note: 'Connectivity paid separately.'
+    }
   ];
 
   const handleSelect = async (amount: number) => {
     try {
       const start = new Date().toISOString();
       const end = new Date();
-      if (amount === 500) {
+      // Annual plans are 499 and 599
+      if (amount === 499 || amount === 599) {
         end.setFullYear(end.getFullYear() + 1);
       } else {
         end.setMonth(end.getMonth() + 1);
@@ -307,51 +333,68 @@ const PlanSelection = ({ user, onPlanSelected }: { user: User, onPlanSelected: (
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6 py-16">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-4xl w-full"
+        className="max-w-6xl w-full"
       >
         <div className="text-center mb-12">
-          <h2 className="font-serif text-4xl mb-4">Choose Your Plan</h2>
-          <p className="text-[#002D72] italic font-serif">Select a plan to start managing your store</p>
+          <h2 className="font-serif text-4xl mb-4">Pricing & Accessibility</h2>
+          <p className="text-[#002D72] max-w-2xl mx-auto italic font-serif opacity-80">
+            Our pricing is designed to balance affordability, operational sustainability, and accessibility for sari-sari store owners in Daraga, Albay.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {plans.map((plan) => (
             <motion.div 
-              key={plan.amount}
+              key={`${plan.label}-${plan.amount}`}
               whileHover={{ y: -10 }}
-              className="bg-white rounded-[40px] p-8 shadow-lg border border-black/5 flex flex-col"
+              className="bg-white rounded-[40px] p-8 shadow-lg border border-black/5 flex flex-col relative overflow-hidden"
             >
               <div className="mb-6">
-                <h3 className="font-serif text-2xl mb-1">{plan.label}</h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-bold">₱{plan.amount}</span>
-                  <span className="text-gray-400 text-sm">{plan.period}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2 block">{plan.label}</span>
+                <div className="flex flex-col">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-bold">₱{plan.amount}</span>
+                    <span className="text-gray-400 text-sm">{plan.period}</span>
+                  </div>
+                  {plan.subAmount && (
+                    <span className="text-xs font-bold text-emerald-600 mt-1">{plan.subAmount}</span>
+                  )}
                 </div>
               </div>
               
               <ul className="space-y-4 mb-8 flex-1">
                 {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-gray-600">
-                    <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                      <Check size={12} />
+                  <li key={i} className="flex items-start gap-3 text-sm text-gray-600">
+                    <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check size={10} />
                     </div>
-                    {feature}
+                    <span className="leading-tight">{feature}</span>
                   </li>
                 ))}
               </ul>
 
+              <div className="mb-6 px-4 py-3 bg-[#0B1D42]/5 rounded-2xl">
+                <p className="text-[10px] text-[#0B1D42]/60 font-medium italic text-center">
+                  {plan.note}
+                </p>
+              </div>
+
               <button 
                 onClick={() => handleSelect(plan.amount)}
-                className="w-full bg-[#002D72] text-white py-4 rounded-full font-bold hover:bg-[#1E3A8A] transition-colors"
+                className="w-full bg-[#002D72] text-white py-4 rounded-full font-bold hover:bg-[#1E3A8A] transition-colors shadow-md active:scale-95"
               >
-                Select Plan
+                Choose Plan
               </button>
             </motion.div>
           ))}
+        </div>
+        
+        <div className="mt-12 text-center text-[10px] text-[#0B1D42]/40 uppercase tracking-widest max-w-4xl mx-auto leading-relaxed">
+          The inclusion of connectivity-supported options is intended to improve accessibility for users who may have limited internet access within the local context of Daraga, Albay. Studies suggest that cost-plus pricing is commonly used for new products and digital services because of its simplicity and transparency (Kotler & Keller, 2016; Nagle & Müller, 2018).
         </div>
       </motion.div>
     </div>
@@ -413,6 +456,8 @@ const AuthPage = ({ onAuth }: { onAuth: (user: User) => void }) => {
         animate={{ opacity: 1, scale: 1 }}
         className="max-w-sm w-full bg-white rounded-[32px] p-8 shadow-lg border border-black/5"
       >
+        <div className="w-12 h-1 bg-[#0B1D42]/5 rounded-full mb-6 mt-2" />
+
         <div className="text-center mb-8 flex flex-col items-center">
           <KeacBranding size="md" mode="dark" />
           <p className="text-[#002D72] italic font-serif text-sm mt-6">Professional Inventory for Daraga, Albay</p>
@@ -1641,36 +1686,32 @@ const Management = () => {
   const [stats, setStats] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const usersSnap = await getDocs(collection(db, 'users'));
-        const usersData = usersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
-        // Filter to only show the main user: carlderick89@gmail.com
-        const filteredUsers = usersData.filter((u: any) => u.email === 'carlderick89@gmail.com');
-        
-        // For each user, fetch their product count and total sales
-        const enrichedUsers = await Promise.all(filteredUsers.map(async (u: any) => {
-          const productsSnap = await getDocs(query(collection(db, 'products'), where('userId', '==', u.id)));
-          const salesSnap = await getDocs(query(collection(db, 'sales'), where('userId', '==', u.id)));
-          
-          const totalSales = salesSnap.docs.reduce((acc, doc) => acc + (doc.data().totalPrice || 0), 0);
-          
-          return {
-            ...u,
-            productCount: productsSnap.size,
-            totalSales
-          };
-        }));
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const usersSnap = await getDocs(collection(db, 'users'));
+      const allUsers = usersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      const enrichedUsers = await Promise.all(allUsers.map(async (u: any) => {
+        const productsSnap = await getDocs(query(collection(db, 'products'), where('userId', '==', u.id)));
+        const salesSnap = await getDocs(query(collection(db, 'sales'), where('userId', '==', u.id)));
+        const totalSales = salesSnap.docs.reduce((acc, doc) => acc + (doc.data().totalPrice || 0), 0);
+        return {
+          ...u,
+          productCount: productsSnap.size,
+          totalSales
+        };
+      }));
 
-        setStats(enrichedUsers);
-      } catch (e) {
-        handleFirestoreError(e, OperationType.LIST, 'users/stats');
-      } finally {
-        setLoading(false);
-      }
-    };
+      setStats(enrichedUsers);
+    } catch (e) {
+      handleFirestoreError(e, OperationType.LIST, 'users/stats');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchStats();
   }, []);
 
@@ -1687,9 +1728,11 @@ const Management = () => {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="font-serif text-3xl font-light">System Management</h1>
-        <p className="text-[#002D72] italic font-serif">Overview of all registered stores in Daraga, Albay</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-3xl font-light">System Management</h1>
+          <p className="text-[#002D72] italic font-serif">Global administration for Daraga stores</p>
+        </div>
       </div>
 
       <div className="bg-white rounded-[32px] shadow-sm border border-black/5 overflow-hidden">
@@ -1709,6 +1752,7 @@ const Management = () => {
             <tbody className="divide-y divide-black/5">
               {stats.map((s) => {
                 const daysLeft = getDaysRemaining(s.subscriptionEnd);
+                const isMainAdmin = s.email?.toLowerCase() === 'carlderick89@gmail.com';
                 return (
                   <tr key={s.id} className="hover:bg-[#F1F5F9]/50 transition-colors">
                     <td className="px-6 py-4 font-medium">{s.storeName}</td>
@@ -1716,8 +1760,8 @@ const Management = () => {
                     <td className="px-6 py-4 text-sm">
                       <span className={cn(
                         "px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
-                        s.plan === 500 ? "bg-purple-100 text-purple-600" :
-                        s.plan === 100 ? "bg-blue-100 text-blue-600" :
+                        s.plan >= 499 ? "bg-purple-100 text-purple-600" :
+                        s.plan >= 149 ? "bg-blue-100 text-blue-600" :
                         s.plan === 49 ? "bg-emerald-100 text-emerald-600" :
                         "bg-gray-100 text-gray-600"
                       )}>
@@ -1836,6 +1880,8 @@ export default function App() {
           setUser({ id: firebaseUser.uid, ...userSnap.data() } as User);
           setStep('app');
         } else {
+          // Authenticated but no database record - force onboarding
+          setUser(null);
           setStep('auth');
         }
       } else {
@@ -1852,7 +1898,7 @@ export default function App() {
     };
   }, []);
 
-  const isAdmin = user?.email === 'carlderick89@gmail.com';
+  const isAdmin = user?.email?.toLowerCase() === 'carlderick89@gmail.com';
 
   const handleLogout = async () => {
     await signOut(auth);
