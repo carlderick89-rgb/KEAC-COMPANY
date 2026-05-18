@@ -70,14 +70,15 @@ service cloud.firestore {
     }
 
     function isValidProduct(data) {
-      return data.keys().hasAll(['userId', 'name', 'category', 'unit', 'costPrice', 'sellingPrice', 'stockQuantity']) &&
-             data.userId == request.auth.uid &&
+      return data.userId == request.auth.uid &&
              data.name is string && data.name.size() > 0 &&
-             data.category is string && data.category.size() > 0 &&
+             data.category is string &&
              data.unit is string && data.unit.size() > 0 &&
-             data.costPrice is number && data.costPrice >= 0 &&
-             data.sellingPrice is number && data.sellingPrice >= 0 &&
-             data.stockQuantity is number;
+             data.get('costPrice', 0) is number &&
+             data.get('sellingPrice', 0) is number &&
+             data.get('stockQuantity', 0) is number &&
+             (data.get('restockDone', false) is bool) &&
+             (data.get('saleDone', false) is bool);
     }
 
     function isValidSale(data) {

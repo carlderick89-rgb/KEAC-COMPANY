@@ -164,7 +164,7 @@ class ErrorBoundary extends React.Component<any, any> {
             <p className="text-gray-600 mb-6">{message}</p>
             <button 
               onClick={() => window.location.reload()}
-              className="bg-[#5A5A40] text-white px-8 py-3 rounded-full font-bold"
+              className="bg-[#002D72] text-white px-8 py-3 rounded-full font-bold"
             >
               Reload Application
             </button>
@@ -178,6 +178,103 @@ class ErrorBoundary extends React.Component<any, any> {
 }
 
 // --- Components ---
+
+const KeacLogo = ({ className = "w-10 h-10", color = "#0B1D42" }: { className?: string, color?: string }) => (
+  <div className={cn("relative flex items-center justify-center", className)}>
+    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      {/* Background Frame / Clipboard shell - Sharp and clean matching the image */}
+      <path 
+        d="M50 45 C50 42, 53 40, 56 40 H144 C147 40, 150 43, 150 46 V114 C150 117, 147 120, 144 120 H56 C53 120, 50 117, 50 114 V95" 
+        stroke={color} 
+        strokeWidth="9" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+      />
+      {/* The bottom right circular button on the frame */}
+      <circle cx="132" cy="110" r="7" stroke={color} strokeWidth="4" fill="white" />
+      <circle cx="132" cy="110" r="2.5" fill={color} />
+
+      {/* Vertical Graph Bars on the right side of the frame */}
+      <rect x="105" y="92" width="6" height="15" fill="#3B82F6" rx="1" />
+      <rect x="115" y="80" width="6" height="27" fill="#3B82F6" rx="1" />
+      <rect x="125" y="65" width="6" height="42" fill="#3B82F6" rx="1" />
+
+      {/* The 3D Box - more detailed and sitting on the left side */}
+      <g transform="translate(18, 48)">
+        {/* Main box silhouette */}
+        <path d="M0 22 L32 4 L64 22 V58 L32 76 L0 58 V22Z" fill={color} />
+        {/* Top flap division */}
+        <path d="M0 22 L32 40 L64 22" stroke="white" strokeWidth="2.5" strokeLinejoin="round" />
+        {/* Center vertical edge */}
+        <path d="M32 40 V76" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+        {/* Taped center section (faded white) */}
+        <path d="M32 4 L32 40" stroke="white" strokeWidth="9" opacity="0.25" strokeLinecap="butt" />
+        
+        {/* Detailed Barcode Label on the front-right face of the box */}
+        <rect x="38" y="42" width="18" height="24" fill="white" rx="1" />
+        <g transform="translate(42, 46)">
+          <rect x="0" y="0" width="1.2" height="16" fill={color} />
+          <rect x="2.5" y="0" width="0.7" height="16" fill={color} />
+          <rect x="4.5" y="0" width="1.2" height="16" fill={color} />
+          <rect x="7" y="0" width="0.7" height="16" fill={color} />
+          <rect x="9.5" y="0" width="1.5" height="16" fill={color} />
+        </g>
+      </g>
+    </svg>
+  </div>
+);
+
+const KeacBranding = ({ size = "md", mode = "dark" }: { size?: "sm" | "md" | "lg" | "xl", mode?: "dark" | "light" }) => {
+  const navy = "#0B1D42";
+  const light = "#FFFFFF";
+  const accent = "#3B82F6";
+  
+  const textColor = mode === "dark" ? navy : light;
+  const logoColor = mode === "dark" ? navy : light;
+  const lineColor = mode === "dark" ? navy : light;
+
+  const sizeClasses = {
+    sm: { h1: "text-2xl", h2: "text-[7px]", icon: "w-14 h-14", gap: "gap-2", dotSize: "w-1.5 h-1.5", lineH: "h-[1.5px]" },
+    md: { h1: "text-4xl", h2: "text-[11px]", icon: "w-24 h-24", gap: "gap-3", dotSize: "w-2 h-2", lineH: "h-[2px]" },
+    lg: { h1: "text-3xl md:text-5xl", h2: "text-[9px] md:text-[12px]", icon: "w-20 h-20 md:w-32 h-32", gap: "gap-3 md:gap-4", dotSize: "w-1.5 h-1.5 md:w-2 h-2", lineH: "h-[1.5px] md:h-[2px]" },
+    xl: { h1: "text-4xl md:text-6xl", h2: "text-[10px] md:text-[14px]", icon: "w-28 h-28 md:w-44 h-44", gap: "gap-3 md:gap-5", dotSize: "w-2 h-2 md:w-3 h-3", lineH: "h-[2px] md:h-[3px]" }
+  };
+
+  const s = sizeClasses[size];
+
+  return (
+    <div className={cn("flex items-center select-none", s.gap)}>
+      <KeacLogo className={s.icon} color={logoColor} />
+      <div className="flex flex-col text-left justify-center">
+        <div className={cn("font-brand font-black tracking-[0.1em] flex items-center leading-none", s.h1)} style={{ color: textColor }}>
+          <span>K</span>
+          <span className="mx-[0.025em]">E</span>
+          <div className="relative inline-flex items-center justify-center mx-[0.05em]">
+             <svg viewBox="0 0 100 100" className="w-[0.95em] h-[0.95em] fill-current">
+                {/* stylized A - matching image's triangle with blue dot */}
+                <path d="M50 12 L95 90 H5 L50 12Z" />
+                <circle cx="50" cy="74" r="14" fill={accent} />
+             </svg>
+          </div>
+          <span className="mx-[0.025em]">C</span>
+        </div>
+        
+        <div className="flex flex-col mt-3">
+          {/* Stylized divider line matching the image spacing */}
+          <div className="flex items-center gap-0.5 px-[0.1em]">
+            <div className={cn(s.dotSize, "rounded-full border-2 shrink-0")} style={{ borderColor: lineColor }} />
+            <div className={cn("flex-1", s.lineH)} style={{ backgroundColor: lineColor, opacity: 0.8 }} />
+            <div className={cn(s.dotSize, "rounded-full border-2 shrink-0")} style={{ borderColor: lineColor }} />
+          </div>
+          <p className={cn("font-brand font-black uppercase tracking-[0.42em] mt-2 whitespace-nowrap px-[0.2em]", s.h2)} style={{ color: textColor }}>
+            Inventory Management System
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 const PlanSelection = ({ user, onPlanSelected }: { user: User, onPlanSelected: (plan: number, start: string, end: string) => void }) => {
   const plans = [
@@ -210,7 +307,7 @@ const PlanSelection = ({ user, onPlanSelected }: { user: User, onPlanSelected: (
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F0] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -218,7 +315,7 @@ const PlanSelection = ({ user, onPlanSelected }: { user: User, onPlanSelected: (
       >
         <div className="text-center mb-12">
           <h2 className="font-serif text-4xl mb-4">Choose Your Plan</h2>
-          <p className="text-[#5A5A40] italic font-serif">Select a plan to start managing your Sari-Sari store</p>
+          <p className="text-[#002D72] italic font-serif">Select a plan to start managing your store</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -249,7 +346,7 @@ const PlanSelection = ({ user, onPlanSelected }: { user: User, onPlanSelected: (
 
               <button 
                 onClick={() => handleSelect(plan.amount)}
-                className="w-full bg-[#5A5A40] text-white py-4 rounded-full font-bold hover:bg-[#4A4A30] transition-colors"
+                className="w-full bg-[#002D72] text-white py-4 rounded-full font-bold hover:bg-[#1E3A8A] transition-colors"
               >
                 Select Plan
               </button>
@@ -310,38 +407,35 @@ const AuthPage = ({ onAuth }: { onAuth: (user: User) => void }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F0] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="max-w-sm w-full bg-white rounded-[32px] p-8 shadow-lg border border-black/5"
       >
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#5A5A40] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Store className="text-white" size={32} />
-          </div>
-          <h2 className="font-serif text-3xl font-light">Sari-Sari Pro</h2>
-          <p className="text-[#5A5A40] italic font-serif text-sm mt-2">Professional Inventory for Daraga, Albay</p>
+        <div className="text-center mb-8 flex flex-col items-center">
+          <KeacBranding size="md" mode="dark" />
+          <p className="text-[#002D72] italic font-serif text-sm mt-6">Professional Inventory for Daraga, Albay</p>
         </div>
 
         {isRegistering ? (
           <form onSubmit={handleCompleteRegistration} className="space-y-4">
             <h3 className="text-center font-serif text-xl mb-4">Complete Registration</h3>
             <div>
-              <label className="text-xs uppercase tracking-widest text-[#5A5A40] font-bold mb-1 block">Store Name</label>
+              <label className="text-xs uppercase tracking-widest text-[#002D72] font-bold mb-1 block">Store Name</label>
               <input 
                 type="text" 
                 value={storeName}
                 onChange={(e) => setStoreName(e.target.value)}
-                className="w-full bg-[#F5F5F0] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#5A5A40] outline-none"
-                placeholder="e.g. Nena's Sari-Sari"
+                className="w-full bg-[#F1F5F9] border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#002D72] outline-none"
+                placeholder="e.g. KEAC Main Branch"
                 required
               />
             </div>
             <button 
               type="submit"
               disabled={loading}
-              className="w-full bg-[#5A5A40] text-white py-3 rounded-full font-medium hover:bg-[#4A4A30] transition-colors disabled:opacity-50"
+              className="w-full bg-[#002D72] text-white py-3 rounded-full font-medium hover:bg-[#1E3A8A] transition-colors disabled:opacity-50"
             >
               {loading ? 'Saving...' : 'Finish Setup'}
             </button>
@@ -462,8 +556,8 @@ const Dashboard = ({ user }: { user: User }) => {
       )}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-3xl font-light text-[#1A1A1A]">Welcome to the Inventory Management System</h1>
-          <p className="text-[#5A5A40] italic font-serif">{user.storeName} • Daraga, Albay</p>
+          <h1 className="font-serif text-3xl font-light text-[#1A1A1A]">Welcome to the KEAC Inventory System</h1>
+          <p className="text-[#002D72] italic font-serif">{user.storeName} • Daraga, Albay</p>
         </div>
       </div>
 
@@ -573,7 +667,7 @@ const Dashboard = ({ user }: { user: User }) => {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="font-serif text-2xl">Restock List</h2>
-                  <p className="text-[#5A5A40] italic font-serif text-sm">Items that need immediate attention</p>
+                  <p className="text-[#002D72] italic font-serif text-sm">Items that need immediate attention</p>
                 </div>
                 <button 
                   onClick={() => setIsLowStockModalOpen(false)}
@@ -623,7 +717,7 @@ const Dashboard = ({ user }: { user: User }) => {
               <div className="mt-8 pt-6 border-t border-black/5">
                 <button 
                   onClick={() => setIsLowStockModalOpen(false)}
-                  className="w-full bg-[#5A5A40] text-white py-4 rounded-full font-bold hover:bg-[#4A4A30] transition-colors"
+                  className="w-full bg-[#002D72] text-white py-4 rounded-full font-bold hover:bg-[#1E3A8A] transition-colors"
                 >
                   Close List
                 </button>
@@ -767,7 +861,10 @@ const Inventory = ({ user }: { user: User }) => {
       const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
       return matchesSearch && matchesCategory;
     })
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort((a, b) => {
+      if (a.restockDone !== b.restockDone) return a.restockDone ? 1 : -1;
+      return a.name.localeCompare(b.name);
+    });
 
   const printLowStock = () => {
     const lowStockItems = products.filter(p => p.stockQuantity <= p.minStockLevel);
@@ -785,10 +882,10 @@ const Inventory = ({ user }: { user: User }) => {
           <title>Low Stock Shopping List</title>
           <style>
             body { font-family: sans-serif; padding: 40px; }
-            h1 { font-family: serif; border-bottom: 2px solid #5A5A40; padding-bottom: 10px; }
+            h1 { font-family: serif; border-bottom: 2px solid #002D72; padding-bottom: 10px; }
             table { width: 100%; border-collapse: collapse; margin-top: 20px; }
             th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-            th { background-color: #F5F5F0; }
+            th { background-color: #F1F5F9; }
             .footer { margin-top: 40px; font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 10px; }
           </style>
         </head>
@@ -816,7 +913,7 @@ const Inventory = ({ user }: { user: User }) => {
             </tbody>
           </table>
           <div class="footer">
-            Generated by Sari-Sari Store Manager
+            Generated by KEAC IMS
           </div>
           <script>
             window.onload = () => {
@@ -836,7 +933,7 @@ const Inventory = ({ user }: { user: User }) => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="font-serif text-3xl font-light">Product Inventory</h1>
-          <p className="text-[#5A5A40] italic font-serif">Manage your stock and pricing</p>
+          <p className="text-[#002D72] italic font-serif">Manage your stock and pricing</p>
         </div>
         <div className="flex gap-3">
           <button 
@@ -847,13 +944,13 @@ const Inventory = ({ user }: { user: User }) => {
           </button>
           <button 
             onClick={() => window.print()}
-            className="bg-white border border-black/10 text-[#5A5A40] px-6 py-3 rounded-full font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors"
+            className="bg-white border border-black/10 text-[#002D72] px-6 py-3 rounded-full font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors"
           >
             Print Report
           </button>
           <button 
             onClick={() => setIsAdding(true)}
-            className="bg-[#5A5A40] text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 hover:bg-[#4A4A30] transition-colors"
+            className="bg-[#002D72] text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 hover:bg-[#1E3A8A] transition-colors"
           >
             <Plus size={18} /> Add New Product
           </button>
@@ -862,7 +959,7 @@ const Inventory = ({ user }: { user: User }) => {
 
       <div className="bg-white rounded-[32px] shadow-sm border border-black/5 overflow-hidden flex flex-col">
         {/* Excel-style Tabs (Sheets) */}
-        <div className="flex items-center bg-[#F5F5F0]/50 border-b border-black/10 overflow-x-auto scrollbar-hide">
+        <div className="flex items-center bg-slate-50 border-b border-black/10 overflow-x-auto scrollbar-hide">
           {categories.map(cat => (
             <button
               key={cat}
@@ -870,7 +967,7 @@ const Inventory = ({ user }: { user: User }) => {
               className={cn(
                 "px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap border-r border-black/5",
                 activeCategory === cat 
-                  ? "bg-white text-[#5A5A40] border-b-2 border-b-[#5A5A40] shadow-[0_-2px_10px_rgba(0,0,0,0.05)]" 
+                  ? "bg-white text-[#002D72] border-b-2 border-b-[#002D72] shadow-[0_-2px_10px_rgba(0,0,0,0.05)]" 
                   : "text-gray-400 hover:bg-white/50 hover:text-gray-600"
               )}
             >
@@ -887,7 +984,7 @@ const Inventory = ({ user }: { user: User }) => {
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-[#F5F5F0] border-none rounded-2xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-[#5A5A40] outline-none"
+              className="w-full bg-[#F1F5F9] border-none rounded-2xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-[#002D72] outline-none"
             />
           </div>
         </div>
@@ -895,22 +992,22 @@ const Inventory = ({ user }: { user: User }) => {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-[#F5F5F0]/50">
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Product Name</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Category</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Unit</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Cost</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Price</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Stock</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Status</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Restock</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Restock Done</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Action</th>
+              <tr className="bg-slate-50">
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Product Name</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Category</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Unit</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Cost</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Price</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Stock</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Status</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Restock</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Restock Done</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-black/5">
               {filteredProducts.map((p) => (
-                <tr key={p.id} className="hover:bg-[#F5F5F0]/30 transition-colors">
+                <tr key={p.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 font-medium">{p.name}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{p.category}</td>
                   <td className="px-6 py-4 text-sm text-gray-500 italic">{p.unit}</td>
@@ -958,7 +1055,7 @@ const Inventory = ({ user }: { user: User }) => {
                   <td className="px-6 py-4">
                     <button 
                       onClick={() => startEditing(p)}
-                      className="text-[#5A5A40] hover:text-black transition-colors"
+                      className="text-[#002D72] hover:text-black transition-colors"
                     >
                       Edit/Restock
                     </button>
@@ -989,17 +1086,17 @@ const Inventory = ({ user }: { user: User }) => {
               <h2 className="font-serif text-2xl mb-6">Add New Product</h2>
               <form onSubmit={handleAdd} className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-1 block">Product Name</label>
+                  <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-1 block">Product Name</label>
                   <input 
                     type="text" value={name} onChange={e => setName(e.target.value)} required
-                    className="w-full bg-[#F5F5F0] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#5A5A40]"
+                    className="w-full bg-[#F1F5F9] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#002D72]"
                   />
                 </div>
                 <div>
-                  <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-1 block">Category</label>
+                  <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-1 block">Category</label>
                   <select 
                     value={category} onChange={e => setCategory(e.target.value)} required
-                    className="w-full bg-[#F5F5F0] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#5A5A40]"
+                    className="w-full bg-[#F1F5F9] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#002D72]"
                   >
                     <option value="">Select Category</option>
                     <option value="Chitchirya">Chitchirya</option>
@@ -1010,10 +1107,10 @@ const Inventory = ({ user }: { user: User }) => {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-1 block">Unit</label>
+                  <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-1 block">Unit</label>
                   <select 
                     value={unit} onChange={e => setUnit(e.target.value)} required
-                    className="w-full bg-[#F5F5F0] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#5A5A40]"
+                    className="w-full bg-[#F1F5F9] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#002D72]"
                   >
                     <option value="piece">Per Piece</option>
                     <option value="pack">Per Pack</option>
@@ -1023,38 +1120,38 @@ const Inventory = ({ user }: { user: User }) => {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-1 block">Min. Stock Level</label>
+                  <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-1 block">Min. Stock Level</label>
                   <input 
                     type="number" value={minStock} onChange={e => setMinStock(e.target.value)} required
-                    className="w-full bg-[#F5F5F0] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#5A5A40]"
+                    className="w-full bg-[#F1F5F9] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#002D72]"
                   />
                 </div>
                 <div>
-                  <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-1 block">Ideal Stock Level</label>
+                  <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-1 block">Ideal Stock Level</label>
                   <input 
                     type="number" value={targetStock} onChange={e => setTargetStock(e.target.value)} required
-                    className="w-full bg-[#F5F5F0] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#5A5A40]"
+                    className="w-full bg-[#F1F5F9] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#002D72]"
                   />
                 </div>
                 <div>
-                  <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-1 block">Cost Price</label>
+                  <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-1 block">Cost Price</label>
                   <input 
                     type="number" step="0.01" value={costPrice} onChange={e => setCostPrice(e.target.value)} required
-                    className="w-full bg-[#F5F5F0] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#5A5A40]"
+                    className="w-full bg-[#F1F5F9] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#002D72]"
                   />
                 </div>
                 <div>
-                  <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-1 block">Selling Price</label>
+                  <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-1 block">Selling Price</label>
                   <input 
                     type="number" step="0.01" value={sellingPrice} onChange={e => setSellingPrice(e.target.value)} required
-                    className="w-full bg-[#F5F5F0] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#5A5A40]"
+                    className="w-full bg-[#F1F5F9] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#002D72]"
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-1 block">Initial Stock Quantity</label>
+                  <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-1 block">Initial Stock Quantity</label>
                   <input 
                     type="number" value={stockQuantity} onChange={e => setStockQuantity(e.target.value)} required
-                    className="w-full bg-[#F5F5F0] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#5A5A40]"
+                    className="w-full bg-[#F1F5F9] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#002D72]"
                   />
                 </div>
                 <div className="col-span-2 flex gap-3 mt-4">
@@ -1067,7 +1164,7 @@ const Inventory = ({ user }: { user: User }) => {
                   </button>
                   <button 
                     type="submit"
-                    className="flex-1 bg-[#5A5A40] text-white py-3 rounded-full font-medium hover:bg-[#4A4A30]"
+                    className="flex-1 bg-[#002D72] text-white py-3 rounded-full font-medium hover:bg-[#1E3A8A]"
                   >
                     Save Product
                   </button>
@@ -1092,33 +1189,33 @@ const Inventory = ({ user }: { user: User }) => {
               
               <form onSubmit={handleUpdate} className="space-y-4">
                 <div>
-                  <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-1 block">Current Stock Quantity</label>
+                  <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-1 block">Current Stock Quantity</label>
                   <input 
                     type="number" value={editStock} onChange={e => setEditStock(e.target.value)} required
-                    className="w-full bg-[#F5F5F0] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#5A5A40]"
+                    className="w-full bg-[#F1F5F9] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#002D72]"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-1 block">Cost Price</label>
+                    <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-1 block">Cost Price</label>
                     <input 
                       type="number" step="0.01" value={editCost} onChange={e => setEditCost(e.target.value)} required
-                      className="w-full bg-[#F5F5F0] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#5A5A40]"
+                      className="w-full bg-[#F1F5F9] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#002D72]"
                     />
                   </div>
                   <div>
-                    <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-1 block">Selling Price</label>
+                    <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-1 block">Selling Price</label>
                     <input 
                       type="number" step="0.01" value={editPrice} onChange={e => setEditPrice(e.target.value)} required
-                      className="w-full bg-[#F5F5F0] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#5A5A40]"
+                      className="w-full bg-[#F1F5F9] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#002D72]"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-1 block">Ideal Stock Level</label>
+                  <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-1 block">Ideal Stock Level</label>
                   <input 
                     type="number" value={editTargetStock} onChange={e => setEditTargetStock(e.target.value)} required
-                    className="w-full bg-[#F5F5F0] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#5A5A40]"
+                    className="w-full bg-[#F1F5F9] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#002D72]"
                   />
                 </div>
 
@@ -1132,7 +1229,7 @@ const Inventory = ({ user }: { user: User }) => {
                   </button>
                   <button 
                     type="submit"
-                    className="flex-1 bg-[#5A5A40] text-white py-3 rounded-xl font-medium hover:bg-[#4A4A30] transition-colors"
+                    className="flex-1 bg-[#002D72] text-white py-3 rounded-xl font-medium hover:bg-[#1E3A8A] transition-colors"
                   >
                     Save Changes
                   </button>
@@ -1148,12 +1245,12 @@ const Inventory = ({ user }: { user: User }) => {
 
 const Sales = ({ user }: { user: User }) => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [cart, setCart] = useState<{product: Product, quantity: number}[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [quantityInput, setQuantityInput] = useState('1');
+  const [isCatalogOpen, setIsCatalogOpen] = useState(false);
 
   useEffect(() => {
     const handleStatus = () => setIsOnline(navigator.onLine);
@@ -1175,73 +1272,49 @@ const Sales = ({ user }: { user: User }) => {
     return () => unsubscribe();
   }, [user.id]);
 
-  const handleAddWithQuantity = (e: React.FormEvent) => {
+  const handleAddWithQuantity = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedProduct) return;
+    if (!selectedProduct || !isOnline) return;
     const qty = parseInt(quantityInput);
     if (isNaN(qty) || qty <= 0) return;
     
-    const existing = cart.find(item => item.product.id === selectedProduct.id);
-    const currentInCart = existing ? existing.quantity : 0;
-    const totalNeeded = currentInCart + qty;
-
-    if (totalNeeded > selectedProduct.stockQuantity) {
-      alert(`Not enough stock! Only ${selectedProduct.stockQuantity} available. You already have ${currentInCart} in cart.`);
+    if (qty > selectedProduct.stockQuantity) {
+      alert(`Not enough stock! Only ${selectedProduct.stockQuantity} available.`);
       return;
     }
 
-    if (existing) {
-      setCart(cart.map(item => item.product.id === selectedProduct.id ? { ...item, quantity: totalNeeded } : item));
-    } else {
-      setCart([...cart, { product: selectedProduct, quantity: qty }]);
-    }
-    setSelectedProduct(null);
-    setQuantityInput('1');
-  };
-
-  const removeFromCart = (productId: string) => {
-    setCart(cart.filter(item => item.product.id !== productId));
-  };
-
-  const handleCheckout = async () => {
-    if (cart.length === 0) return;
-    
     try {
       const batch = writeBatch(db);
+      const saleRef = doc(collection(db, 'sales'));
+      const productRef = doc(db, 'products', selectedProduct.id);
       
-      for (const item of cart) {
-        const saleRef = doc(collection(db, 'sales'));
-        const productRef = doc(db, 'products', item.product.id);
-        
-        const totalPrice = item.product.sellingPrice * item.quantity;
-        const totalCost = item.product.costPrice * item.quantity;
-        const profit = totalPrice - totalCost;
+      const totalPrice = selectedProduct.sellingPrice * qty;
+      const totalCost = selectedProduct.costPrice * qty;
+      const profit = totalPrice - totalCost;
 
-        batch.set(saleRef, {
-          userId: user.id,
-          productId: item.product.id,
-          productName: item.product.name,
-          category: item.product.category,
-          quantity: item.quantity,
-          totalPrice,
-          profit,
-          saleDate: serverTimestamp()
-        });
+      batch.set(saleRef, {
+        userId: user.id,
+        productId: selectedProduct.id,
+        productName: selectedProduct.name,
+        category: selectedProduct.category,
+        quantity: qty,
+        totalPrice,
+        profit,
+        saleDate: serverTimestamp()
+      });
 
-        batch.update(productRef, {
-          stockQuantity: increment(-item.quantity)
-        });
-      }
+      batch.update(productRef, {
+        stockQuantity: increment(-qty),
+        saleDone: true
+      });
 
       await batch.commit();
-      setCart([]);
-      alert('Sale recorded successfully!');
+      setSelectedProduct(null);
+      setQuantityInput('1');
     } catch (e) {
       handleFirestoreError(e, OperationType.WRITE, 'sales/products');
     }
   };
-
-  const total = cart.reduce((sum, item) => sum + (item.product.sellingPrice * item.quantity), 0);
 
   const categories = ['All', ...PREDEFINED_CATEGORIES];
 
@@ -1251,192 +1324,158 @@ const Sales = ({ user }: { user: User }) => {
       const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
       return matchesSearch && matchesCategory && p.stockQuantity > 0;
     })
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort((a, b) => {
+      if (a.saleDone !== b.saleDone) return a.saleDone ? 1 : -1;
+      return a.name.localeCompare(b.name);
+    });
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <div className="lg:col-span-2 flex flex-col h-[calc(100vh-120px)]">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="font-serif text-3xl font-light">Record Sale</h1>
-            <p className="text-[#5A5A40] italic font-serif">Quickly record customer purchases</p>
-          </div>
-          <button 
-            onClick={async () => {
-              if (!confirm('Are you sure you want to reset all "Done" marks?')) return;
-              try {
-                const batch = writeBatch(db);
-                products.forEach(p => {
-                  if (p.saleDone) {
-                    batch.update(doc(db, 'products', p.id), { saleDone: false });
-                  }
-                });
-                await batch.commit();
-              } catch (e) {
-                handleFirestoreError(e, OperationType.WRITE, 'products/reset-sales');
-              }
-            }}
-            className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-[#5A5A40] transition-colors"
-          >
-            Reset All Marks
-          </button>
-        </div>
-
-        <div className="bg-white rounded-[32px] shadow-sm border border-black/5 flex flex-col flex-1 overflow-hidden">
-          {/* Excel-style Tabs (Sheets) at the top */}
-          <div className="flex items-center bg-[#F5F5F0]/50 border-b border-black/10 overflow-x-auto scrollbar-hide">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={cn(
-                  "px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap border-r border-black/5",
-                  activeCategory === cat 
-                    ? "bg-white text-[#5A5A40] border-b-2 border-b-[#5A5A40] shadow-[0_-2px_10px_rgba(0,0,0,0.05)]" 
-                    : "text-gray-400 hover:bg-white/50 hover:text-gray-600"
-                )}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          <div className="p-4 border-b border-black/5">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input 
-                type="text"
-                placeholder="Search products to sell..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-[#F5F5F0] border-none rounded-xl pl-12 pr-4 py-3 shadow-inner focus:ring-2 focus:ring-[#5A5A40] outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-[#F5F5F0]/50 sticky top-0 z-10">
-                  <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Product Name</th>
-                  <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Unit</th>
-                  <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Price</th>
-                  <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Stock</th>
-                  <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Done?</th>
-                  <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-black/5">
-                {filteredProducts.map(p => (
-                  <tr key={p.id} className={cn(
-                    "hover:bg-[#F5F5F0]/30 transition-colors group",
-                    p.saleDone && "opacity-50"
-                  )}>
-                    <td className="px-6 py-4 font-medium">
-                      <div className="flex items-center gap-2">
-                        {p.name}
-                        {p.saleDone && <Check size={14} className="text-emerald-500" />}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-xs text-gray-400 italic">{p.unit}</td>
-                    <td className="px-6 py-4 font-black text-[#5A5A40]">{formatCurrency(p.sellingPrice)}</td>
-                    <td className="px-6 py-4">
-                      <span className={cn(
-                        "px-2 py-1 rounded-md text-[10px] font-bold",
-                        p.stockQuantity <= p.minStockLevel ? "bg-amber-100 text-amber-700" : "bg-[#F5F5F0] text-gray-500"
-                      )}>
-                        {p.stockQuantity}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <button 
-                        onClick={async () => {
-                          try {
-                            await updateDoc(doc(db, 'products', p.id), { saleDone: !p.saleDone });
-                          } catch (e) {
-                            handleFirestoreError(e, OperationType.UPDATE, `products/${p.id}`);
-                          }
-                        }}
-                        className={cn(
-                          "w-6 h-6 rounded-md border flex items-center justify-center transition-all",
-                          p.saleDone ? "bg-emerald-500 border-emerald-500 text-white" : "border-gray-200 text-transparent hover:border-emerald-500"
-                        )}
-                      >
-                        <Check size={14} />
-                      </button>
-                    </td>
-                    <td className="px-6 py-4">
-                      <button 
-                        disabled={p.saleDone}
-                        onClick={() => {
-                          setSelectedProduct(p);
-                          setQuantityInput('1');
-                        }}
-                        className="bg-[#5A5A40] text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-[#4A4A30] transition-all shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
-                      >
-                        Sell
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {filteredProducts.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-20 text-center text-gray-400 italic">
-                      No products found in this sheet.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+    <div className="flex flex-col h-[calc(100vh-120px)]">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="font-serif text-3xl font-light">Record Sale</h1>
+          <p className="text-[#002D72] italic font-serif">Select items to record immediate sales</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-[40px] shadow-xl border border-black/5 p-8 h-fit sticky top-8">
-        <h3 className="font-serif text-2xl mb-6 flex items-center gap-2">
-          <ShoppingCart size={24} className="text-[#5A5A40]" /> Current Sale
-        </h3>
-        
-        <div className="space-y-4 mb-8 max-h-96 overflow-y-auto pr-2">
-          {cart.map(item => (
-            <div key={item.product.id} className="flex items-center justify-between group">
-              <div className="flex-1">
-                <p className="font-medium text-sm">{item.product.name}</p>
-                <p className="text-xs text-gray-400">{item.quantity} {item.product.unit}(s) x {formatCurrency(item.product.sellingPrice)}</p>
+      <div className="bg-white rounded-[32px] shadow-sm border border-black/5 flex flex-col flex-1 overflow-hidden relative">
+        {!isCatalogOpen ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsCatalogOpen(true)}
+              className="group flex flex-col items-center gap-6"
+            >
+              <div className="w-32 h-32 bg-[#002D72]/5 rounded-[40px] flex items-center justify-center group-hover:bg-[#002D72]/10 transition-colors">
+                <ShoppingCart size={64} className="text-[#002D72]" />
               </div>
-              <div className="flex items-center gap-3">
-                <p className="font-bold text-sm">{formatCurrency(item.product.sellingPrice * item.quantity)}</p>
-                <button 
-                  onClick={() => removeFromCart(item.product.id)}
-                  className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <Plus size={16} className="rotate-45" />
-                </button>
+              <div>
+                <h2 className="font-serif text-2xl mb-2">Start Recording Sales</h2>
+                <p className="text-gray-400 text-sm max-w-xs">Click here to browse your products and record purchases instantly</p>
               </div>
-            </div>
-          ))}
-          {cart.length === 0 && (
-            <div className="text-center py-12 text-gray-300">
-              <ShoppingCart size={48} className="mx-auto mb-4 opacity-20" />
-              <p className="italic">Cart is empty</p>
-            </div>
-          )}
-        </div>
-
-        <div className="border-t border-black/5 pt-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-gray-400 uppercase tracking-widest text-xs font-bold">Total Amount</span>
-            <span className="text-3xl font-light">{formatCurrency(total)}</span>
+              <div className="mt-4 px-8 py-4 bg-[#002D72] text-white rounded-full font-bold shadow-lg shadow-[#002D72]/20 group-hover:bg-[#1E3A8A] transition-colors">
+                Record Sale
+              </div>
+            </motion.button>
           </div>
-          <button 
-            disabled={cart.length === 0 || !isOnline}
-            onClick={handleCheckout}
-            className="w-full bg-[#5A5A40] text-white py-4 rounded-full font-bold hover:bg-[#4A4A30] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {!isOnline && <WifiOff size={18} />}
-            {isOnline ? 'Complete Sale' : 'Offline - Reconnect to Save'}
-          </button>
-        </div>
+        ) : (
+          <>
+            {/* Excel-style Tabs (Sheets) at the top */}
+            <div className="flex items-center bg-slate-50 border-b border-black/10 overflow-x-auto scrollbar-hide">
+              <button 
+                onClick={() => setIsCatalogOpen(false)}
+                className="px-4 py-3 border-r border-black/5 hover:bg-gray-100 transition-colors text-gray-400"
+                title="Close Catalog"
+              >
+                <Plus size={20} className="rotate-45" />
+              </button>
+              {categories.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={cn(
+                    "px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap border-r border-black/5",
+                    activeCategory === cat 
+                      ? "bg-white text-[#002D72] border-b-2 border-b-[#002D72] shadow-[0_-2px_10px_rgba(0,0,0,0.05)]" 
+                      : "text-gray-400 hover:bg-white/50 hover:text-gray-600"
+                  )}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            <div className="p-4 border-b border-black/5">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <input 
+                  type="text"
+                  placeholder="Search products to sell..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-[#F1F5F9] border-none rounded-xl pl-12 pr-4 py-3 shadow-inner focus:ring-2 focus:ring-[#002D72] outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-slate-50 sticky top-0 z-10">
+                    <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Product Name</th>
+                    <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Unit</th>
+                    <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Price</th>
+                    <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Stock</th>
+                    <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Done?</th>
+                    <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-black/5">
+                  {filteredProducts.map(p => (
+                    <tr key={p.id} className={cn(
+                      "hover:bg-[#F1F5F9]/50 transition-colors group",
+                      p.saleDone && "opacity-50"
+                    )}>
+                      <td className="px-6 py-4 font-medium">
+                        <div className="flex items-center gap-2">
+                          {p.name}
+                          {p.saleDone && <Check size={14} className="text-emerald-500" />}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-xs text-gray-400 italic">{p.unit}</td>
+                      <td className="px-6 py-4 font-black text-[#002D72]">{formatCurrency(p.sellingPrice)}</td>
+                      <td className="px-6 py-4">
+                        <span className={cn(
+                          "px-2 py-1 rounded-md text-[10px] font-bold",
+                          p.stockQuantity <= p.minStockLevel ? "bg-amber-100 text-amber-700" : "bg-[#F1F5F9] text-gray-500"
+                        )}>
+                          {p.stockQuantity}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <button 
+                          onClick={async () => {
+                            try {
+                              await updateDoc(doc(db, 'products', p.id), { saleDone: !p.saleDone });
+                            } catch (e) {
+                              handleFirestoreError(e, OperationType.UPDATE, `products/${p.id}`);
+                            }
+                          }}
+                          className={cn(
+                            "w-6 h-6 rounded-md border flex items-center justify-center transition-all",
+                            p.saleDone ? "bg-emerald-500 border-emerald-500 text-white" : "border-gray-200 text-transparent hover:border-emerald-500"
+                          )}
+                        >
+                          <Check size={14} />
+                        </button>
+                      </td>
+                      <td className="px-6 py-4">
+                        <button 
+                          disabled={p.saleDone}
+                          onClick={() => {
+                            setSelectedProduct(p);
+                            setQuantityInput('1');
+                          }}
+                          className="bg-[#002D72] text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-[#1E3A8A] transition-all shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                          Sell Item
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  {filteredProducts.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-20 text-center text-gray-400 italic">
+                        No products found in this sheet.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
 
       <AnimatePresence>
@@ -1455,14 +1494,14 @@ const Sales = ({ user }: { user: User }) => {
               
               <form onSubmit={handleAddWithQuantity} className="space-y-4">
                 <div>
-                  <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-1 block">
+                  <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-1 block">
                     How many {selectedProduct.unit}(s)?
                   </label>
                   <div className="flex items-center gap-3">
                     <button 
                       type="button"
                       onClick={() => setQuantityInput(prev => Math.max(1, parseInt(prev || '0') - 1).toString())}
-                      className="w-12 h-12 rounded-xl bg-[#F5F5F0] flex items-center justify-center text-xl font-bold"
+                      className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-xl font-bold"
                     >
                       -
                     </button>
@@ -1473,12 +1512,12 @@ const Sales = ({ user }: { user: User }) => {
                       required
                       min="1"
                       max={selectedProduct.stockQuantity}
-                      className="flex-1 bg-[#F5F5F0] border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#5A5A40] text-center text-xl font-bold"
+                      className="flex-1 bg-slate-100 border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#002D72] text-center text-xl font-bold"
                     />
                     <button 
                       type="button"
                       onClick={() => setQuantityInput(prev => Math.min(selectedProduct.stockQuantity, parseInt(prev || '0') + 1).toString())}
-                      className="w-12 h-12 rounded-xl bg-[#F5F5F0] flex items-center justify-center text-xl font-bold"
+                      className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-xl font-bold"
                     >
                       +
                     </button>
@@ -1496,9 +1535,10 @@ const Sales = ({ user }: { user: User }) => {
                   </button>
                   <button 
                     type="submit"
-                    className="flex-1 bg-[#5A5A40] text-white py-3 rounded-xl font-medium hover:bg-[#4A4A30] transition-colors"
+                    disabled={!isOnline}
+                    className="flex-1 bg-[#002D72] text-white py-3 rounded-xl font-medium hover:bg-[#1E3A8A] transition-colors disabled:opacity-50"
                   >
-                    Add to Cart
+                    Confirm Sale
                   </button>
                 </div>
               </form>
@@ -1537,7 +1577,7 @@ const Survey = ({ user }: { user: User }) => {
           <Star className="fill-current" size={40} />
         </div>
         <h2 className="font-serif text-3xl mb-2">Thank you for your feedback!</h2>
-        <p className="text-[#5A5A40] italic font-serif">Your input helps us improve the system for Daraga.</p>
+        <p className="text-[#002D72] italic font-serif">Your input helps us improve the system for Daraga.</p>
       </div>
     );
   }
@@ -1546,12 +1586,12 @@ const Survey = ({ user }: { user: User }) => {
     <div className="max-w-2xl mx-auto">
       <div className="mb-8">
         <h1 className="font-serif text-3xl font-light">Pilot Feedback Survey</h1>
-        <p className="text-[#5A5A40] italic font-serif">Help us refine the system for Daraga sari-sari stores</p>
+        <p className="text-[#002D72] italic font-serif">Help us refine the system for Daraga retailers</p>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white p-10 rounded-[40px] shadow-sm border border-black/5 space-y-8">
         <div>
-          <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-4 block">How easy is it to use the system?</label>
+          <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-4 block">How easy is it to use the system?</label>
           <div className="flex gap-4">
             {[1, 2, 3, 4, 5].map((num) => (
               <button
@@ -1561,8 +1601,8 @@ const Survey = ({ user }: { user: User }) => {
                 className={cn(
                   "flex-1 py-4 rounded-2xl font-bold transition-all",
                   rating === num 
-                    ? "bg-[#5A5A40] text-white shadow-lg scale-105" 
-                    : "bg-[#F5F5F0] text-gray-400 hover:bg-gray-200"
+                    ? "bg-[#002D72] text-white shadow-lg scale-105" 
+                    : "bg-slate-50 text-gray-400 hover:bg-gray-200"
                 )}
               >
                 {num}
@@ -1576,11 +1616,11 @@ const Survey = ({ user }: { user: User }) => {
         </div>
 
         <div>
-          <label className="text-xs uppercase tracking-widest font-bold text-[#5A5A40] mb-2 block">What features would you like to see added?</label>
+          <label className="text-xs uppercase tracking-widest font-bold text-[#002D72] mb-2 block">What features would you like to see added?</label>
           <textarea 
             value={comments}
             onChange={(e) => setComments(e.target.value)}
-            className="w-full bg-[#F5F5F0] border-none rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-[#5A5A40] h-32 resize-none"
+            className="w-full bg-[#F1F5F9] border-none rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-[#002D72] h-32 resize-none"
             placeholder="Share your thoughts..."
             required
           />
@@ -1588,7 +1628,7 @@ const Survey = ({ user }: { user: User }) => {
 
         <button 
           type="submit"
-          className="w-full bg-[#5A5A40] text-white py-4 rounded-full font-bold hover:bg-[#4A4A30] transition-colors"
+          className="w-full bg-[#002D72] text-white py-4 rounded-full font-bold hover:bg-[#1E3A8A] transition-colors"
         >
           Submit Feedback
         </button>
@@ -1646,28 +1686,28 @@ const Management = () => {
     <div className="space-y-8">
       <div>
         <h1 className="font-serif text-3xl font-light">System Management</h1>
-        <p className="text-[#5A5A40] italic font-serif">Overview of all registered stores in Daraga, Albay</p>
+        <p className="text-[#002D72] italic font-serif">Overview of all registered stores in Daraga, Albay</p>
       </div>
 
       <div className="bg-white rounded-[32px] shadow-sm border border-black/5 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-[#F5F5F0]/50">
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Store Name</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Owner Email</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Plan</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Subscription</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Status</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Products</th>
-                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#5A5A40]">Total Sales</th>
+              <tr className="bg-[#F1F5F9]/50">
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Store Name</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Owner Email</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Plan</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Subscription</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Status</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Products</th>
+                <th className="px-6 py-4 text-xs uppercase tracking-widest font-bold text-[#002D72]">Total Sales</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-black/5">
               {stats.map((s) => {
                 const daysLeft = getDaysRemaining(s.subscriptionEnd);
                 return (
-                  <tr key={s.id} className="hover:bg-[#F5F5F0]/30 transition-colors">
+                  <tr key={s.id} className="hover:bg-[#F1F5F9]/50 transition-colors">
                     <td className="px-6 py-4 font-medium">{s.storeName}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">{s.email}</td>
                     <td className="px-6 py-4 text-sm">
@@ -1725,49 +1765,45 @@ const MobileLegendsIntro = ({ onComplete }: { onComplete: () => void }) => {
   }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center overflow-hidden">
+    <div className="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center overflow-hidden">
       {/* Background Glow */}
       <motion.div 
         initial={{ opacity: 0, scale: 0.5 }}
-        animate={{ opacity: [0, 0.5, 0], scale: [0.5, 1.5, 2] }}
+        animate={{ opacity: [0, 0.4, 0], scale: [0.5, 1.5, 2] }}
         transition={{ duration: 3, times: [0, 0.5, 1], ease: "easeOut" }}
-        className="absolute w-[600px] h-[600px] bg-amber-500/20 rounded-full blur-[120px]"
+        className="absolute w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-[120px]"
       />
 
       <div className="relative z-10 text-center">
         <motion.div
-          initial={{ opacity: 0, scale: 5, filter: "blur(20px)" }}
+          initial={{ opacity: 0, scale: 0.8, filter: "blur(20px)" }}
           animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="mb-2"
+          className="mb-8"
         >
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.8)] italic">
-            KEAC <span className="text-amber-500">COMPANY</span>
-          </h1>
+          <KeacBranding size="xl" mode="dark" />
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.5 }}
-          className="overflow-hidden"
+          className="mt-12"
         >
-          <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-amber-500 to-transparent mb-4" />
-          <p className="text-amber-200 uppercase tracking-[0.3em] text-sm md:text-base font-bold drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">
-            Inventory Management System
+          <p className="text-gray-400 uppercase tracking-[0.3em] text-sm md:text-base font-bold font-brand">
+            Manual to Modern
           </p>
-          <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-amber-500 to-transparent mt-4" />
         </motion.div>
       </div>
 
       {/* Particle-like lines */}
-      {[...Array(10)].map((_, i) => (
+      {[...Array(15)].map((_, i) => (
         <motion.div
           key={i}
           initial={{ opacity: 0, x: Math.random() * 200 - 100, y: Math.random() * 200 - 100 }}
           animate={{ opacity: [0, 1, 0], x: Math.random() * 1000 - 500, y: Math.random() * 1000 - 500 }}
-          transition={{ duration: 2, delay: 0.5 + Math.random(), repeat: Infinity }}
-          className="absolute w-1 h-1 bg-amber-400 rounded-full"
+          transition={{ duration: 3, delay: 0.5 + Math.random(), repeat: Infinity }}
+          className="absolute w-1 h-1 bg-white/30 rounded-full"
         />
       ))}
     </div>
@@ -1821,37 +1857,37 @@ export default function App() {
     setStep('auth');
   };
 
-  if (!isAuthReady) return <div className="min-h-screen flex items-center justify-center bg-[#F5F5F0]">Loading...</div>;
+  if (!isAuthReady) return <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">Loading...</div>;
 
   if (showIntro) return <MobileLegendsIntro onComplete={() => setShowIntro(false)} />;
 
   if (step === 'auth' && !user) return <AuthPage onAuth={(u) => { setUser(u); setStep('app'); }} />;
   
   if (user && user.plan === 0) {
-    return <PlanSelection user={user} onPlanSelected={(plan, start, end) => { setUser({ ...user, plan, subscriptionStart: start, subscriptionEnd: end }); setShowIntro(true); }} />;
+    return <PlanSelection user={user} onPlanSelected={(plan, start, end) => { setUser({ ...user, plan, subscriptionStart: start, subscriptionEnd: end }); }} />;
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F0] flex">
+    <div className="min-h-screen bg-[#F8FAFC] flex">
       {/* Sidebar */}
-      <aside className="w-20 md:w-64 bg-[#1A1A1A] text-white flex flex-col p-4 md:p-6 transition-all">
-        <div className="flex items-center gap-3 mb-12 px-2">
-          <div className="w-10 h-10 bg-[#5A5A40] rounded-xl flex items-center justify-center shrink-0">
-            <Store size={20} />
+      <aside className="w-20 md:w-80 bg-white text-gray-800 flex flex-col p-4 md:p-6 transition-all border-r border-black/5 shadow-sm">
+        <div className="mb-12">
+          <div className="md:hidden flex justify-center">
+             <KeacLogo className="w-10 h-10" color="#0B1D42" />
           </div>
           <div className="hidden md:block">
-            <span className="font-serif text-xl block">Sari-Sari Pro</span>
-            <div className="flex items-center gap-1 mt-1">
-              {isOnline ? (
-                <div className="flex items-center gap-1 text-[10px] text-emerald-400 font-bold uppercase tracking-widest">
-                  <Wifi size={10} /> Online
-                </div>
-              ) : (
-                <div className="flex items-center gap-1 text-[10px] text-amber-400 font-bold uppercase tracking-widest">
-                  <WifiOff size={10} /> Offline
-                </div>
-              )}
-            </div>
+            <KeacBranding size="sm" mode="dark" />
+          </div>
+          <div className="flex items-center gap-1 mt-6 px-2">
+            {isOnline ? (
+              <div className="flex items-center gap-1 text-[10px] text-emerald-500 font-bold uppercase tracking-widest">
+                <Wifi size={10} /> Online
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 text-[10px] text-amber-500 font-bold uppercase tracking-widest">
+                <WifiOff size={10} /> Offline
+              </div>
+            )}
           </div>
         </div>
 
@@ -1869,8 +1905,8 @@ export default function App() {
               className={cn(
                 "w-full flex items-center gap-3 p-3 rounded-xl transition-all",
                 activeTab === item.id 
-                  ? "bg-[#5A5A40] text-white" 
-                  : "text-gray-400 hover:bg-white/5 hover:text-white"
+                  ? "bg-[#0B1D42] text-white shadow-md" 
+                  : "text-gray-500 hover:bg-[#F1F5F9] hover:text-[#0B1D42]"
               )}
             >
               <item.icon size={20} />
@@ -1879,22 +1915,22 @@ export default function App() {
           ))}
         </nav>
 
-        <div className="mt-auto pt-6 border-t border-white/10">
+        <div className="mt-auto pt-6 border-t border-black/5">
           <div className="flex items-center gap-3 mb-6 px-2">
-            <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 bg-[#F1F5F9] text-[#0B1D42] rounded-full flex items-center justify-center shrink-0">
               <UserIcon size={14} />
             </div>
             <div className="hidden md:block overflow-hidden">
-              <p className="text-sm font-medium truncate">{user?.storeName}</p>
-              <p className="text-[10px] text-gray-500 truncate">{user?.email}</p>
+              <p className="text-sm font-semibold truncate text-[#0B1D42]">{user?.storeName}</p>
+              <p className="text-[10px] text-gray-400 truncate">{user?.email}</p>
             </div>
           </div>
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 p-3 rounded-xl text-red-400 hover:bg-red-400/10 transition-all"
+            className="w-full flex items-center gap-3 p-3 rounded-xl text-red-500 hover:bg-red-50 transition-all font-medium"
           >
             <LogOut size={20} />
-            <span className="hidden md:block font-medium">Logout</span>
+            <span className="hidden md:block">Logout</span>
           </button>
         </div>
       </aside>
